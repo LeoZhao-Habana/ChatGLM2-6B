@@ -2,13 +2,17 @@ from transformers import AutoModel, AutoTokenizer
 import gradio as gr
 import mdtex2html
 from utils import load_model_on_gpus
+import habana_frameworks.torch as ht
+import habana_frameworks.torch.gpu_migration
+import habana_frameworks.torch.core as htcore
 
-tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm2-6b", trust_remote_code=True)
-model = AutoModel.from_pretrained("THUDM/chatglm2-6b", trust_remote_code=True).cuda()
+tokenizer = AutoTokenizer.from_pretrained("../chatglm2-6b", trust_remote_code=True)
+model = AutoModel.from_pretrained("../chatglm2-6b", trust_remote_code=True).half().cuda()
 # 多显卡支持，使用下面两行代替上面一行，将num_gpus改为你实际的显卡数量
 # from utils import load_model_on_gpus
 # model = load_model_on_gpus("THUDM/chatglm2-6b", num_gpus=2)
 model = model.eval()
+model = ht.hpu.wrap_in_hpu_graph(model)
 
 """Override Chatbot.postprocess"""
 
@@ -92,7 +96,7 @@ with gr.Blocks() as demo:
                 submitBtn = gr.Button("Submit", variant="primary")
         with gr.Column(scale=1):
             emptyBtn = gr.Button("Clear History")
-            max_length = gr.Slider(0, 32768, value=8192, step=1.0, label="Maximum length", interactive=True)
+            max_length = gr.Slider(0, 32768, value=32768, step=1.0, label="Maximum length", interactive=True)
             top_p = gr.Slider(0, 1, value=0.8, step=0.01, label="Top P", interactive=True)
             temperature = gr.Slider(0, 1, value=0.95, step=0.01, label="Temperature", interactive=True)
 
@@ -105,4 +109,4 @@ with gr.Blocks() as demo:
 
     emptyBtn.click(reset_state, outputs=[chatbot, history, past_key_values], show_progress=True)
 
-demo.queue().launch(share=False, inbrowser=True)
+demo.queue().launch(share=True, inbrowser=True)
