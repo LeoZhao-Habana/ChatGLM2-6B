@@ -44,10 +44,14 @@ from trainer_seq2seq import Seq2SeqTrainer
 
 from arguments import ModelArguments, DataTrainingArguments
 
+import habana_frameworks.torch.gpu_migration
+import habana_frameworks.torch.core as htcore
+from gaudi_arguments import Chatglm2TrainArguments
+
 logger = logging.getLogger(__name__)
 
 def main():
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Chatglm2TrainArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
