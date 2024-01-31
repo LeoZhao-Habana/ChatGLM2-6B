@@ -3,11 +3,12 @@ import gradio as gr
 import mdtex2html
 from utils import load_model_on_gpus
 import habana_frameworks.torch as ht
-import habana_frameworks.torch.gpu_migration
+#import habana_frameworks.torch.gpu_migration
 import habana_frameworks.torch.core as htcore
+import torch
 
 tokenizer = AutoTokenizer.from_pretrained("../chatglm2-6b", trust_remote_code=True)
-model = AutoModel.from_pretrained("../chatglm2-6b", trust_remote_code=True).half().cuda()
+model = AutoModel.from_pretrained("../chatglm2-6b", trust_remote_code=True).to("hpu", dtype=torch.bfloat16)
 # 多显卡支持，使用下面两行代替上面一行，将num_gpus改为你实际的显卡数量
 # from utils import load_model_on_gpus
 # model = load_model_on_gpus("THUDM/chatglm2-6b", num_gpus=2)
