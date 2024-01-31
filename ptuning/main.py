@@ -44,7 +44,7 @@ from trainer_seq2seq import Seq2SeqTrainer
 
 from arguments import ModelArguments, DataTrainingArguments
 
-import habana_frameworks.torch.gpu_migration
+#import habana_frameworks.torch.gpu_migration
 import habana_frameworks.torch.core as htcore
 from gaudi_arguments import Chatglm2TrainArguments
 
